@@ -1,15 +1,12 @@
 // Declare variable to store audio player
 let audioPlayer;
 let input;
-let shine_loop;
-let main_loop;
-let beginning_loop;
-const beginning_start = 0;
-const beginning_end = 60; 
-const main_start = 180;
-const main_end = 210;
-const shine_start = 210;
-const shine_end = 250;
+let loopCheckboxes = [];
+let sections = [
+  { name: 'Beginning', start: 0, end: 60 },
+  { name: 'Main Part', start: 180, end: 210 },
+  { name: 'Main Part 2', start: 210, end: 250 }
+];
 
 function setup() {
   noCanvas();
@@ -27,22 +24,19 @@ function setup() {
   createButton('+1').mousePressed(() => changeSpeed(1)).parent(controlsWrapper);
   createButton('+5').mousePressed(() => changeSpeed(5)).parent(controlsWrapper);
 
-  // Section jump buttons
+  // Jump buttons
   let jumpButtons = createDiv().addClass('controls');
   jumpButtons.parent(main);
-  createButton('Jump to Beginning').mousePressed(() => jumpTo(beginning_start)).parent(jumpButtons);
-  createButton('Jump to Main Part').mousePressed(() => jumpTo(main_start)).parent(jumpButtons);
-  createButton('Jump to Main Part 2').mousePressed(() => jumpTo(shine_start)).parent(jumpButtons);
 
   // Loop toggles
   let loopSection = createDiv().addClass('controls');
   loopSection.parent(main);
-  beginning_loop = createCheckbox('Loop Beginning');
-  beginning_loop.parent(loopSection);
-  main_loop = createCheckbox('Loop Main Part');
-  main_loop.parent(loopSection);
-  shine_loop = createCheckbox('Loop Main Part 2');
-  shine_loop.parent(loopSection);
+
+  sections.forEach((section, index) => {
+    createButton(`Jump to ${section.name}`).mousePressed(() => jumpTo(section.start)).parent(jumpButtons);
+    loopCheckboxes[index] = createCheckbox(`Loop ${section.name}`);
+    loopCheckboxes[index].parent(loopSection);
+  });
 
   // Audio
   audioPlayer = createAudio("song2.mp3");
@@ -51,14 +45,20 @@ function setup() {
 }
 
 function draw() {
-  if (beginning_loop.checked()) {
-    if (audioPlayer.time() > beginning_end) audioPlayer.time(beginning_start);
-  } else if (shine_loop.checked()) {
-    if (audioPlayer.time() > shine_end) {
-      audioPlayer.time(main_loop.checked() ? main_start : shine_start);
+  let currentTime = audioPlayer.time();
+
+  // Collect active loop sections
+  let activeLoops = sections
+    .map((s, i) => ({ ...s, checked: loopCheckboxes[i].checked() }))
+    .filter(s => s.checked);
+
+  if (activeLoops.length > 0) {
+    let latestEnd = Math.max(...activeLoops.map(s => s.end));
+    let earliestStart = Math.min(...activeLoops.map(s => s.start));
+
+    if (currentTime > latestEnd) {
+      audioPlayer.time(earliestStart);
     }
-  } else if (main_loop.checked()) {
-    if (audioPlayer.time() > main_end) audioPlayer.time(main_start);
   }
 }
 
