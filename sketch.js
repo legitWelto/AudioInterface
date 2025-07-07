@@ -8,6 +8,9 @@ let sections = [
   { name: 'Main Part 2', start: 210, end: 250 }
 ];
 
+let loopDelayMs = 4000; // delay before looping
+let loopTimeoutId = null;
+
 function setup() {
   noCanvas();
 
@@ -20,7 +23,8 @@ function setup() {
   createButton('-1').mousePressed(() => changeSpeed(-1)).parent(controlsWrapper);
   input = createInput("100");
   input.size(40, 20);
-  input.mouseOut(() => setSpeedFromInput()).parent(controlsWrapper);
+  input.parent(controlsWrapper);
+  input.input(() => setSpeedFromInput()); // change: use input event instead of mouseOut
   createButton('+1').mousePressed(() => changeSpeed(1)).parent(controlsWrapper);
   createButton('+5').mousePressed(() => changeSpeed(5)).parent(controlsWrapper);
 
@@ -47,7 +51,6 @@ function setup() {
 function draw() {
   let currentTime = audioPlayer.time();
 
-  // Collect active loop sections
   let activeLoops = sections
     .map((s, i) => ({ ...s, checked: loopCheckboxes[i].checked() }))
     .filter(s => s.checked);
@@ -57,7 +60,22 @@ function draw() {
     let earliestStart = Math.min(...activeLoops.map(s => s.start));
 
     if (currentTime > latestEnd) {
-      audioPlayer.time(earliestStart);
+      if (!loopTimeoutId) {
+        audioPlayer.pause();
+        loopTimeoutId = setTimeout(() => {
+          audioPlayer.time(earliestStart);
+          audioPlayer.play();
+          loopTimeoutId = null;
+        }, loopDelayMs);
+      }
+    }
+  } else {
+    if (loopTimeoutId) {
+      clearTimeout(loopTimeoutId);
+      loopTimeoutId = null;
+      if (audioPlayer.paused) {
+        audioPlayer.play();
+      }
     }
   }
 }
