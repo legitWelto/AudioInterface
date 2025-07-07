@@ -4,8 +4,10 @@ let input;
 let loopCheckboxes = [];
 let sections = [
   { name: 'Beginning', start: 0, end: 60 },
-  { name: 'Main Part', start: 180, end: 210 },
-  { name: 'Main Part 2', start: 210, end: 250 }
+  { name: 'Main Part', start: 180, end: 215 },
+  { name: 'Main Part 2', start: 208, end: 225 },
+  { name: 'Main Part 3', start: 222, end: 240 },
+  { name: 'End', start: 278, end: 339 },
 ];
 
 let loopDelayMs = 4000; // delay before looping

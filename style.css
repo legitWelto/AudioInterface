@@ -1,4 +1,3 @@
-/* Modern styles for audio player layout */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f9f9f9;
@@ -14,7 +13,6 @@ main {
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  text-align: center;
 }
 
 h1 {
@@ -26,7 +24,6 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: center;
   margin-bottom: 1rem;
 }
 
@@ -52,13 +49,8 @@ button:hover {
 label, .checkboxes {
   margin-top: 1rem;
   display: block;
-  text-align: center;
 }
 
 input[type="checkbox"] {
   margin-right: 0.5rem;
-}
-
-.audio-controls {
-  margin-top: 1rem;
 }
