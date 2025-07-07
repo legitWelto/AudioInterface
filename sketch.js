@@ -3,6 +3,7 @@ let audioPlayer;
 let input;
 let shine_loop;
 let main_loop;
+let beginning_loop;
 const beginning_start = 0;
 const beginning_end = 60; 
 const main_start = 180;
@@ -14,43 +15,58 @@ function setup() {
   // Remove canvas
   noCanvas();
 
-  // Create audio player using path to audio file
-  // This can also be a URL for a public file
-  // On the p5 Editor, a file may be uploaded to Sketch Files
-  // by clicking the > button on the upper left, followed by the + button
-  audioPlayer = createAudio("song2.mp3");
-  
-  text("Speed control", 0, 60);
-  let faster = createButton('+5');
-  faster.position(100, 70);
-  faster.mousePressed(increaseSpeed);
-  input = createInput("100");
-  input.position(40, 70);
-  input.size(40, 16);
-  input.mouseOut(setSpeed);
+  const main = select('main');
+
+  // Title
+  let controlsWrapper = createDiv().addClass('controls');
+  controlsWrapper.parent(main);
+
+  // Speed control UI
   let slower = createButton('-5');
   slower.mousePressed(decreaseSpeed);
-  slower.position(0, 70);
-  
-  shine_loop = createCheckbox('loop main part 2');
-  shine_loop.position(0, 230);
-  
-  main_loop = createCheckbox('loop main part');
-  main_loop.position(0, 210);
-  
-  beginning_loop = createCheckbox('loop beginning');
-  beginning_loop.position(0, 190);
-  
-  let start_main = createButton('jump to main part');
-  start_main.position(0, 130);
-  start_main.mousePressed(jump_to_main);
-  let start_shine = createButton('jump to main part 2');
-  start_shine.position(0, 160);
-  start_shine.mousePressed(jump_to_shine);
-  let start_beginning = createButton('jump to beginning');
-  start_beginning.position(0, 100);
+  slower.parent(controlsWrapper);
+
+  input = createInput("100");
+  input.size(40, 20);
+  input.mouseOut(setSpeed);
+  input.parent(controlsWrapper);
+
+  let faster = createButton('+5');
+  faster.mousePressed(increaseSpeed);
+  faster.parent(controlsWrapper);
+
+  // Section jump buttons
+  let jumpButtons = createDiv().addClass('controls');
+  jumpButtons.parent(main);
+
+  let start_beginning = createButton('Jump to Beginning');
   start_beginning.mousePressed(jump_to_beginning);
-  // Display player controls
+  start_beginning.parent(jumpButtons);
+
+  let start_main = createButton('Jump to Main Part');
+  start_main.mousePressed(jump_to_main);
+  start_main.parent(jumpButtons);
+
+  let start_shine = createButton('Jump to Main Part 2');
+  start_shine.mousePressed(jump_to_shine);
+  start_shine.parent(jumpButtons);
+
+  // Loop toggles
+  let loopSection = createDiv().addClass('controls');
+  loopSection.parent(main);
+
+  beginning_loop = createCheckbox('Loop Beginning');
+  beginning_loop.parent(loopSection);
+
+  main_loop = createCheckbox('Loop Main Part');
+  main_loop.parent(loopSection);
+
+  shine_loop = createCheckbox('Loop Main Part 2');
+  shine_loop.parent(loopSection);
+
+  // Audio
+  audioPlayer = createAudio("song2.mp3");
+  audioPlayer.parent(main);
   audioPlayer.showControls();
 }
 
@@ -87,7 +103,6 @@ function increaseSpeed(){
     console.log('couldnt update speed');
   } 
 }
-
 
 function setSpeed(){
   audioPlayer.speed(input.value()/100);

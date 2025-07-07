@@ -1,7 +1,64 @@
-html, body {
+/* Modern styles for audio player layout */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9f9f9;
   margin: 0;
-  padding: 0;
+  padding: 2rem;
+  color: #333;
 }
-canvas {
+
+main {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+input[type="text"], button {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+label, .checkboxes {
+  margin-top: 1rem;
   display: block;
+  text-align: center;
+}
+
+input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.audio-controls {
+  margin-top: 1rem;
 }
