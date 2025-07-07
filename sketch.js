@@ -37,7 +37,7 @@ function setup() {
   loopSection.parent(main);
 
   sections.forEach((section, index) => {
-    createButton(`Jump to ${section.name}`).mousePressed(() => jumpTo(section.start)).parent(jumpButtons);
+    createButton(`${section.name}`).mousePressed(() => jumpTo(section.start)).parent(jumpButtons);
     loopCheckboxes[index] = createCheckbox(`Loop ${section.name}`);
     loopCheckboxes[index].parent(loopSection);
   });
@@ -49,8 +49,6 @@ function setup() {
 }
 
 function draw() {
-  let currentTime = audioPlayer.time();
-
   let activeLoops = sections
     .map((s, i) => ({ ...s, checked: loopCheckboxes[i].checked() }))
     .filter(s => s.checked);
@@ -59,12 +57,13 @@ function draw() {
     let latestEnd = Math.max(...activeLoops.map(s => s.end));
     let earliestStart = Math.min(...activeLoops.map(s => s.start));
 
-    if (currentTime > latestEnd) {
+    if (audioPlayer.time() > latestEnd) {
       if (!loopTimeoutId) {
         audioPlayer.pause();
         loopTimeoutId = setTimeout(() => {
-          audioPlayer.time(earliestStart);
           audioPlayer.play();
+          jumpTo(earliestStart);
+          setSpeedFromInput();
           loopTimeoutId = null;
         }, loopDelayMs);
       }
@@ -75,6 +74,7 @@ function draw() {
       loopTimeoutId = null;
       if (audioPlayer.paused) {
         audioPlayer.play();
+        setSpeedFromInput();
       }
     }
   }
