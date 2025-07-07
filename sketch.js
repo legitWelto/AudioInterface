@@ -92,3 +92,10 @@ function setSpeedFromInput() {
 function jumpTo(time) {
   audioPlayer.time(time);
 }
+
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
+  navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
+  navigator.mediaSession.setActionHandler('seekbackward', () => changeSpeed(-5));
+  navigator.mediaSession.setActionHandler('seekforward', () => changeSpeed(5));
+}
