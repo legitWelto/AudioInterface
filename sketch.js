@@ -1,6 +1,6 @@
 // Declare variable to store audio player
 let audioPlayer;
-let input;
+let delayInput;
 let loopCheckboxes = [];
 let sections = [
   { name: 'Beginning', start: 0, end: 60 },
@@ -12,23 +12,61 @@ let sections = [
 
 let loopDelayMs = 4000; // delay before looping
 let loopTimeoutId = null;
+let currentSpeed = 100;
 
 function setup() {
   noCanvas();
 
   const main = select('main');
+
+  // Speed controls container
   let controlsWrapper = createDiv().addClass('controls');
   controlsWrapper.parent(main);
 
-  // Speed controls
   createButton('-5').mousePressed(() => changeSpeed(-5)).parent(controlsWrapper);
   createButton('-1').mousePressed(() => changeSpeed(-1)).parent(controlsWrapper);
-  input = createInput("100");
-  input.size(40, 20);
-  input.parent(controlsWrapper);
-  input.input(() => setSpeedFromInput()); // change: use input event instead of mouseOut
+
+  // Speed input field (free typing, clamp on blur or enter)
+  let speedInput = createInput(currentSpeed.toString(), 'number');
+  speedInput.size(50, 20);
+  speedInput.style('text-align', 'center');
+  speedInput.parent(controlsWrapper);
+
+  speedInput.input(() => {
+    // Update currentSpeed only if input is a valid number (no constraint here)
+    let val = parseInt(speedInput.value());
+    if (!isNaN(val)) {
+      currentSpeed = val; // don't clamp here, allow typing intermediate values
+      setSpeedFromInput();
+    }
+  });
+
+  speedInput.elt.addEventListener('blur', () => {
+    // Clamp and update input field on blur
+    currentSpeed = constrain(currentSpeed, 50, 120);
+    speedInput.value(currentSpeed);
+    setSpeedFromInput();
+  });
+
+  speedInput.elt.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      speedInput.elt.blur(); // trigger blur to clamp value
+    }
+  });
+
   createButton('+1').mousePressed(() => changeSpeed(1)).parent(controlsWrapper);
   createButton('+5').mousePressed(() => changeSpeed(5)).parent(controlsWrapper);
+
+  // Delay input
+  let delayWrapper = createDiv().addClass('controls');
+  delayWrapper.parent(main);
+  let delayLabel = createDiv('Loop Delay (seconds):');
+  delayLabel.style('display', 'block');
+  delayLabel.parent(delayWrapper);
+  delayInput = createInput((loopDelayMs / 1000).toString(), 'number');
+  delayInput.size(60, 20);
+  delayInput.parent(delayWrapper);
+  delayInput.input(() => updateLoopDelay());
 
   // Jump buttons
   let jumpButtons = createDiv().addClass('controls');
@@ -48,6 +86,7 @@ function setup() {
   audioPlayer = createAudio("song2.mp3");
   audioPlayer.parent(main);
   audioPlayer.showControls();
+  setSpeedFromInput();
 }
 
 function draw() {
@@ -83,12 +122,20 @@ function draw() {
 }
 
 function changeSpeed(delta) {
-  input.value(int(input.value()) + delta);
-  audioPlayer.speed(int(input.value()) / 100);
+  currentSpeed = constrain(currentSpeed + delta, 50, 120);
+  setSpeedFromInput();
+
+  // Update input field as well
+  let speedInput = select('input[type=number]');
+  if (speedInput) speedInput.value(currentSpeed);
 }
 
 function setSpeedFromInput() {
-  audioPlayer.speed(int(input.value()) / 100);
+  audioPlayer.speed(currentSpeed / 100);
+}
+
+function updateLoopDelay() {
+  loopDelayMs = int(delayInput.value()) * 1000;
 }
 
 function jumpTo(time) {
